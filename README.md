@@ -1,2 +1,31 @@
-# Smart-Attendance-System
-It is a online attendance tracker created by group of four where you can track the attendance , make the lectures available to teachers , also used features like GPS tracker ,Face recognition system and Wi-fi connection system .A web-based smart attendance system using Flask and face recognition to efficiently manage and track student attendance.
+# Smart Attendance System
+
+A web-based smart attendance system built using Flask and face recognition to efficiently manage and track student attendance.
+
+---
+
+## 🚀 Features
+- Face Recognition Attendance
+- Student & Faculty Login System
+- Attendance Tracking & Records
+- Lecture Scheduling for Faculty
+- GPS-based verification (optional)
+- Wi-Fi based validation system
+
+---
+
+## 🛠️ Tech Stack
+- Python (Flask)
+- OpenCV & DeepFace
+- HTML, CSS
+- CSV (Database)
+
+---
+
+## 📁 Project Structure
+app.py
+templates/
+faces/
+attendance.csv
+users.csv
+schedule.csv
