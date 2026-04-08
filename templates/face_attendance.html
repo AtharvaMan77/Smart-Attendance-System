@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Verification</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a, #1e293b, #334155);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: white;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 24px;
+            align-items: stretch;
+        }
+
+        .info-card,
+        .camera-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 24px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+            padding: 30px;
+        }
+
+        .info-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(59, 130, 246, 0.18);
+            color: #93c5fd;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 18px;
+            width: fit-content;
+        }
+
+        h1 {
+            font-size: 34px;
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            line-height: 1.7;
+            color: #cbd5e1;
+            margin-bottom: 26px;
+        }
+
+        .user-box {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 16px 18px;
+            margin-bottom: 22px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .user-box p {
+            margin: 0;
+            color: #e2e8f0;
+            font-size: 15px;
+        }
+
+        .user-box strong {
+            color: #ffffff;
+            font-size: 18px;
+        }
+
+        .tips {
+            display: grid;
+            gap: 12px;
+        }
+
+        .tip {
+            background: rgba(255, 255, 255, 0.06);
+            padding: 14px 16px;
+            border-radius: 14px;
+            color: #dbeafe;
+            font-size: 15px;
+            border-left: 4px solid #60a5fa;
+        }
+
+        .camera-card {
+            text-align: center;
+        }
+
+        .camera-header {
+            margin-bottom: 20px;
+        }
+
+        .camera-header h2 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .camera-header p {
+            color: #cbd5e1;
+            font-size: 15px;
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 520px;
+            margin: 0 auto 20px auto;
+            border-radius: 22px;
+            overflow: hidden;
+            background: #0f172a;
+            border: 2px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        video {
+            width: 100%;
+            height: auto;
+            display: block;
+            transform: scaleX(-1);
+            background: black;
+        }
+
+        .face-frame {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 220px;
+            height: 280px;
+            transform: translate(-50%, -50%);
+            border: 3px solid rgba(96, 165, 250, 0.9);
+            border-radius: 24px;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.18);
+            pointer-events: none;
+        }
+
+        .face-frame::before,
+        .face-frame::after {
+            content: "";
+            position: absolute;
+            width: 34px;
+            height: 34px;
+            border: 4px solid #93c5fd;
+        }
+
+        .face-frame::before {
+            top: -3px;
+            left: -3px;
+            border-right: none;
+            border-bottom: none;
+            border-top-left-radius: 18px;
+        }
+
+        .face-frame::after {
+            bottom: -3px;
+            right: -3px;
+            border-left: none;
+            border-top: none;
+            border-bottom-right-radius: 18px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        button {
+            border: none;
+            outline: none;
+            padding: 14px 26px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .verify-btn {
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: white;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+        }
+
+        .verify-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.45);
+        }
+
+        .verify-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.09);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.16);
+        }
+
+        .status-box {
+            margin-top: 22px;
+            padding: 16px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.06);
+            min-height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #e2e8f0;
+            font-size: 16px;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .status-success {
+            color: #86efac;
+        }
+
+        .status-error {
+            color: #fca5a5;
+        }
+
+        .status-loading {
+            color: #93c5fd;
+        }
+
+        .loader {
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(255, 255, 255, 0.25);
+            border-top: 3px solid #60a5fa;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        canvas {
+            display: none;
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .info-card,
+            .camera-card {
+                padding: 22px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            .camera-header h2 {
+                font-size: 24px;
+            }
+
+            .face-frame {
+                width: 180px;
+                height: 240px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 14px;
+            }
+
+            .info-card,
+            .camera-card {
+                border-radius: 18px;
+                padding: 18px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .subtitle,
+            .camera-header p {
+                font-size: 14px;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .face-frame {
+                width: 150px;
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="info-card">
+            <div class="badge">Smart Attendance System</div>
+
+            <h1>Face Verification Portal</h1>
+            <p class="subtitle">
+                Verify your face before marking attendance. Please keep your face inside the frame,
+                stay in proper lighting, and look directly at the camera for better matching.
+            </p>
+
+            <div class="user-box">
+                <p>Logged in as</p>
+                <strong>{{ session['user_id'] }}</strong>
+            </div>
+
+            <div class="tips">
+                <div class="tip">Make sure your full face is clearly visible.</div>
+                <div class="tip">Avoid low light, blur, and too much background movement.</div>
+                <div class="tip">Do not move too much while verification is running.</div>
+            </div>
+        </div>
+
+        <div class="camera-card">
+            <div class="camera-header">
+                <h2>Live Camera Verification</h2>
+                <p>Your face will be captured in 3 frames for secure attendance marking.</p>
+            </div>
+
+            <div class="video-wrapper">
+                <video id="video" autoplay playsinline></video>
+                <div class="face-frame"></div>
+            </div>
+
+            <canvas id="canvas" width="320" height="240"></canvas>
+
+            <div class="controls">
+                <button class="verify-btn" id="verifyBtn" onclick="startVerification()">Verify Face</button>
+                <button class="back-btn" onclick="window.location.href='/student_dashboard'">Back</button>
+            </div>
+
+            <div class="status-box" id="result">Camera is starting...</div>
+        </div>
+    </div>
+
+    <script>
+        const video = document.getElementById("video");
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+        const resultText = document.getElementById("result");
+        const verifyBtn = document.getElementById("verifyBtn");
+
+        function setStatus(message, type = "") {
+            resultText.className = "status-box";
+            if (type === "success") resultText.classList.add("status-success");
+            if (type === "error") resultText.classList.add("status-error");
+            if (type === "loading") resultText.classList.add("status-loading");
+            resultText.innerHTML = message;
+        }
+
+        // Start camera
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+                setStatus("Camera is ready. Please align your face and click Verify Face.");
+            })
+            .catch(error => {
+                setStatus("Camera access denied or camera not available.", "error");
+            });
+
+        function captureFrame() {
+            ctx.save();
+
+            // Flip image to match mirrored video
+            ctx.scale(-1, 1);
+            ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
+
+            ctx.restore();
+
+            return canvas.toDataURL("image/jpeg");
+        }
+
+        async function startVerification() {
+            verifyBtn.disabled = true;
+            setStatus('<span class="loader"></span>Capturing images...', "loading");
+
+            let images = [];
+
+            images.push(captureFrame());
+            await new Promise(r => setTimeout(r, 1000));
+            images.push(captureFrame());
+            await new Promise(r => setTimeout(r, 1000));
+            images.push(captureFrame());
+
+            setStatus('<span class="loader"></span>Verifying face...', "loading");
+
+            fetch("/verify_face", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ images: images })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        setStatus(data.message, "success");
+
+                        setStatus('<span class="loader"></span>Face verified. Marking attendance...', "loading");
+
+                        fetch("/mark_attendance", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            }
+                        })
+                            .then(res => res.json())
+                            .then(attData => {
+                                if (attData.status === "success") {
+                                    setStatus(attData.message, "success");
+                                    alert(attData.message);
+                                    window.location.href = "/student_dashboard";
+                                } else {
+                                    setStatus(attData.message, "error");
+                                    alert(attData.message);
+                                    verifyBtn.disabled = false;
+                                }
+                            })
+                            .catch(error => {
+                                setStatus("Error while marking attendance.", "error");
+                                verifyBtn.disabled = false;
+                            });
+
+                    } else {
+                        setStatus(data.message, "error");
+                        alert(data.message);
+                        verifyBtn.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    setStatus("Verification failed. Please try again.", "error");
+                    verifyBtn.disabled = false;
+                });
+        }
+    </script>
+
+</body>
+
+</html>

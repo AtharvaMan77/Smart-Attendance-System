@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Login</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: linear-gradient(135deg, #1d4350, #a43931);
+            height: 100vh;
+        }
+
+        .header {
+            width: 100%;
+            background: white;
+            height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 40px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        .logo {
+            max-height: 80%;
+            width: auto;
+        }
+
+        .container {
+            height: calc(100vh - 130px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-box {
+            width: 350px;
+            padding: 40px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        input {
+            width: 90%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        button {
+            width: 95%;
+            padding: 12px;
+            margin-top: 10px;
+            background: #2e7d32;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1b5e20;
+        }
+
+        .back-btn {
+            background: #e74c3c;
+        }
+
+        .back-btn:hover {
+            background: #c0392b;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <img src="https://tse2.mm.bing.net/th/id/OIP.Y_JmyqeVExlqEMKP3EeVFQAAAA?rs=1&pid=ImgDetMain&o=7&rm=3" class="logo">
+    </div>
+    <div class="container">
+        <div class="login-box">
+            <h2>Student Login</h2>
+
+            <form action="/login" method="POST">
+                <input type="text" name="student_id" placeholder="Student ID"><br>
+                <input type="password" name="password" placeholder="Password"><br>
+                <button type="submit">Login</button>
+            </form>
+
+            <br><br>
+
+            <a href="/">
+                <button type="button" class="back-btn">Back to Main Page</button>
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>
